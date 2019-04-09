@@ -1,6 +1,9 @@
 ﻿using ContactsBook.models;
+using ContactsBook.validators;
+using FluentValidation.Results;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 
 namespace ContactsBook
@@ -17,12 +20,13 @@ namespace ContactsBook
 
         public ObservableCollection<Contact> Contacts { get; set; }
         public ObservableCollection<Contact> SavedContacts { get; set; }
+        private BindingList<string> errors = new BindingList<string>();
 
         private void SaveContact(object sender, RoutedEventArgs e)
         {
-            Contact contact = new Contact(name.Text);
-            Contacts.Add(contact);
-            SavedContacts.Add(contact);
+            Contact contact = new Contact();
+            contact.Name = name.Text;
+            Validate(contact);
             name.Text = String.Empty;
         }
         
@@ -49,6 +53,7 @@ namespace ContactsBook
         {
             Storage.Visibility = Visibility.Visible;
         }
+
         private void RefreshContacts(object sender, RoutedEventArgs e)
         {
             foreach (var contact in SavedContacts)
@@ -58,6 +63,25 @@ namespace ContactsBook
                     contact.IsSelected = false;
                     Contacts.Add(contact);
                 }
+            }
+        }
+
+        private void Validate(Contact contact)
+        {
+            ContactValidator validator = new ContactValidator();
+            var results = validator.Validate(contact);
+            if (results.IsValid == false)
+            {
+                foreach (ValidationFailure failure in results.Errors)
+                {
+                    errors.Add(failure.ErrorMessage);
+                    MessageBox.Show(failure.ErrorMessage);
+                }
+            }
+            else
+            {
+                Contacts.Add(contact);
+                SavedContacts.Add(contact);
             }
         }
     }
