@@ -6,10 +6,10 @@ namespace ContactsBook.models
     {
         private string name;
 
-        public Contact(string name)
-        {
-            Name = name;
-        }
+        //public Contact(string name)
+        //{
+        //    Name = name;
+        //}
 
         public string Name
         {
@@ -21,10 +21,7 @@ namespace ContactsBook.models
         public event PropertyChangedEventHandler PropertyChanged;
         private void Notify(string propName)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
